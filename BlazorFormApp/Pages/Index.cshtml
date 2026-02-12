@@ -126,7 +126,7 @@
                 </div>
                 <div class="form-group">
                     <button type="submit" class="btn btn-primary">查詢</button>
-                    <a href="/Create" class="btn btn-success">新增商品</a>
+                    <a href="/Create?empNo=@Model.CurrentUser" class="btn btn-success">新增商品</a>
                 </div>
             </form>
         </div>
@@ -152,8 +152,8 @@
                         <td>$@item.Price</td>
                         <td>@item.Stock</td>
                         <td>
-                            <a href="/Detail?id=@item.Id" class="action-link">明細</a>
-                            <a href="/Edit?id=@item.Id" class="action-link">編輯</a>
+                            <a href="/Detail?id=@item.Id&empNo=@Model.CurrentUser" class="action-link">明細</a>
+                            <a href="/Edit?id=@item.Id&empNo=@Model.CurrentUser" class="action-link">編輯</a>
                         </td>
                     </tr>
                 }

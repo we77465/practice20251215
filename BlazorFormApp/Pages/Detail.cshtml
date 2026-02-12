@@ -120,15 +120,15 @@
             </div>
 
             <div class="action-bar">
-                <a href="/Edit?id=@Model.Product.Id" class="btn btn-primary">編輯</a>
-                <a href="/" class="btn btn-secondary">返回列表</a>
+                <a href="/Edit?id=@Model.Product.Id&empNo=@Model.CurrentUser" class="btn btn-primary">編輯</a>
+                <a href="/?empNo=@Model.CurrentUser" class="btn btn-secondary">返回列表</a>
             </div>
         }
         else
         {
             <p>找不到此商品資料</p>
             <div class="action-bar">
-                <a href="/" class="btn btn-secondary">返回列表</a>
+                <a href="/?empNo=@Model.CurrentUser" class="btn btn-secondary">返回列表</a>
             </div>
         }
     </div>

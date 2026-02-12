@@ -1,4 +1,4 @@
-# .NET 6 Blazor Form Application
+# .NET 8 Blazor Form Application
 
 ## 專案說明
 
