@@ -1,0 +1,309 @@
+@page
+@model EditModel
+@{
+    ViewData["Title"] = Model.IsEditMode ? "編輯商品" : "新增商品";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .user-info {
+            text-align: right;
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-label {
+            display: block;
+            font-weight: bold;
+            color: #555;
+            margin-bottom: 5px;
+        }
+        .required {
+            color: red;
+        }
+        input[type="text"],
+        input[type="number"],
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 3px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        .btn {
+            padding: 10px 25px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        .action-bar {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+        .message {
+            padding: 10px;
+            margin-bottom: 20px;
+            border-radius: 3px;
+        }
+        .message-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .message-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="user-info">
+            登入者：@Model.CurrentUser
+        </div>
+        
+        <h1>@ViewData["Title"]</h1>
+
+        @if (!string.IsNullOrEmpty(Model.Message))
+        {
+            <div class="message @(Model.IsSuccess ? "message-success" : "message-error")">
+                @Model.Message
+            </div>
+        }
+
+        <form method="post">
+            @if (Model.IsEditMode)
+            {
+                <div class="form-group">
+                    <label class="form-label">商品編號：</label>
+                    <input type="text" name="Id" value="@Model.Product.Id" readonly style="background-color: #e9ecef;" />
+                </div>
+            }
+            
+            <div class="form-group">
+                <label class="form-label"><span class="required">*</span> 商品名稱：</label>
+                <input type="text" name="Name" value="@Model.Product.Name" required />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label"><span class="required">*</span> 商品類別：</label>
+                <select name="Category" required>
+                    <option value="">請選擇</option>
+                    @if (Model.Product.Category == "爬蟲類")
+                    {
+                        <option value="爬蟲類" selected>爬蟲類</option>
+                    }
+                    else
+                    {
+                        <option value="爬蟲類">爬蟲類</option>
+                    }
+                    @if (Model.Product.Category == "飼料")
+                    {
+                        <option value="飼料" selected>飼料</option>
+                    }
+                    else
+                    {
+                        <option value="飼料">飼料</option>
+                    }
+                    @if (Model.Product.Category == "設備")
+                    {
+                        <option value="設備" selected>設備</option>
+                    }
+                    else
+                    {
+                        <option value="設備">設備</option>
+                    }
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label"><span class="required">*</span> 價格：</label>
+                <input type="number" name="Price" value="@Model.Product.Price" required min="0" step="0.01" />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label"><span class="required">*</span> 庫存數量：</label>
+                <input type="number" name="Stock" value="@Model.Product.Stock" required min="0" />
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">商品描述：</label>
+                <textarea name="Description">@Model.Product.Description</textarea>
+            </div>
+
+            <div class="action-bar">
+                <button type="submit" class="btn btn-primary">儲存</button>
+                <a href="/?empNo=@Model.CurrentUser" class="btn btn-secondary">取消</a>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
+
+@functions {
+    public class EditModel : Microsoft.AspNetCore.Mvc.RazorPages.PageModel
+    {
+        public string CurrentUser { get; set; } = "";
+        public bool IsEditMode { get; set; } = false;
+        public ProductForm Product { get; set; } = new ProductForm();
+        public string Message { get; set; } = "";
+        public bool IsSuccess { get; set; } = false;
+
+        public void OnGet()
+        {
+            // 取得登入者資訊
+            CurrentUser = AuthHelper.GetEmpNo(Request.Query);
+            
+            // 檢查是否為編輯模式
+            string? productId = Request.Query["id"];
+            if (!string.IsNullOrEmpty(productId))
+            {
+                IsEditMode = true;
+                LoadProduct(productId);
+            }
+        }
+
+        public void OnPost()
+        {
+            // 取得登入者資訊
+            CurrentUser = AuthHelper.GetEmpNo(Request.Query);
+            
+            // 取得表單資料
+            Product.Id = Request.Form["Id"];
+            Product.Name = Request.Form["Name"];
+            Product.Category = Request.Form["Category"];
+            
+            if (decimal.TryParse(Request.Form["Price"], out decimal price))
+            {
+                Product.Price = price;
+            }
+            
+            if (int.TryParse(Request.Form["Stock"], out int stock))
+            {
+                Product.Stock = stock;
+            }
+            
+            Product.Description = Request.Form["Description"];
+
+            // 判斷是新增還是編輯
+            IsEditMode = !string.IsNullOrEmpty(Product.Id);
+
+            // 驗證資料
+            if (string.IsNullOrEmpty(Product.Name))
+            {
+                Message = "商品名稱為必填欄位";
+                IsSuccess = false;
+                return;
+            }
+
+            if (string.IsNullOrEmpty(Product.Category))
+            {
+                Message = "商品類別為必填欄位";
+                IsSuccess = false;
+                return;
+            }
+
+            if (Product.Price <= 0)
+            {
+                Message = "價格必須大於0";
+                IsSuccess = false;
+                return;
+            }
+
+            if (Product.Stock < 0)
+            {
+                Message = "庫存數量不可為負數";
+                IsSuccess = false;
+                return;
+            }
+
+            // 儲存資料（這裡只是示範，實際應該要寫入資料庫）
+            if (IsEditMode)
+            {
+                Message = $"商品 {Product.Id} 已成功更新！";
+            }
+            else
+            {
+                // 產生新的商品編號
+                Product.Id = "P" + DateTime.Now.ToString("yyyyMMddHHmmss");
+                Message = $"商品 {Product.Id} 已成功新增！";
+            }
+            
+            IsSuccess = true;
+        }
+
+        private void LoadProduct(string productId)
+        {
+            // 示範用假資料
+            var products = new Dictionary<string, ProductForm>
+            {
+                { "P001", new ProductForm { Id = "P001", Name = "綠鬣蜥", Category = "爬蟲類", Price = 3500, Stock = 5, Description = "溫馴的綠鬣蜥，適合新手飼養" }},
+                { "P002", new ProductForm { Id = "P002", Name = "豹紋守宮", Category = "爬蟲類", Price = 2800, Stock = 8, Description = "受歡迎的守宮品種，好照顧" }},
+                { "P003", new ProductForm { Id = "P003", Name = "爬蟲專用飼料", Category = "飼料", Price = 450, Stock = 50, Description = "營養均衡的爬蟲類專用飼料" }},
+                { "P004", new ProductForm { Id = "P004", Name = "紫外線燈具", Category = "設備", Price = 1200, Stock = 15, Description = "提供必要的UVB光源" }},
+                { "P005", new ProductForm { Id = "P005", Name = "玉米蛇", Category = "爬蟲類", Price = 4200, Stock = 3, Description = "顏色多樣的玉米蛇，個性溫和" }}
+            };
+
+            if (products.ContainsKey(productId))
+            {
+                Product = products[productId];
+            }
+        }
+    }
+
+    public class ProductForm
+    {
+        public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Category { get; set; } = "";
+        public decimal Price { get; set; }
+        public int Stock { get; set; }
+        public string Description { get; set; } = "";
+    }
+}

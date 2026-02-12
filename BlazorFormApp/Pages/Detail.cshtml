@@ -1,0 +1,244 @@
+@page
+@model DetailModel
+@{
+    ViewData["Title"] = "商品明細";
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>@ViewData["Title"]</title>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 10px;
+        }
+        .user-info {
+            text-align: right;
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .detail-row {
+            display: flex;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .detail-label {
+            width: 150px;
+            font-weight: bold;
+            color: #555;
+        }
+        .detail-value {
+            flex: 1;
+            color: #333;
+        }
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-right: 10px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn:hover {
+            opacity: 0.8;
+        }
+        .action-bar {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 2px solid #eee;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="user-info">
+            登入者：@Model.CurrentUser
+        </div>
+        
+        <h1>@ViewData["Title"]</h1>
+
+        @if (Model.Product != null)
+        {
+            <div class="detail-row">
+                <div class="detail-label">商品編號：</div>
+                <div class="detail-value">@Model.Product.Id</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">商品名稱：</div>
+                <div class="detail-value">@Model.Product.Name</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">商品類別：</div>
+                <div class="detail-value">@Model.Product.Category</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">價格：</div>
+                <div class="detail-value">$@Model.Product.Price</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">庫存數量：</div>
+                <div class="detail-value">@Model.Product.Stock</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">商品描述：</div>
+                <div class="detail-value">@Model.Product.Description</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">建立日期：</div>
+                <div class="detail-value">@Model.Product.CreateDate.ToString("yyyy/MM/dd HH:mm")</div>
+            </div>
+            <div class="detail-row">
+                <div class="detail-label">建立者：</div>
+                <div class="detail-value">@Model.Product.Creator</div>
+            </div>
+
+            <div class="action-bar">
+                <a href="/Edit?id=@Model.Product.Id&empNo=@Model.CurrentUser" class="btn btn-primary">編輯</a>
+                <a href="/?empNo=@Model.CurrentUser" class="btn btn-secondary">返回列表</a>
+            </div>
+        }
+        else
+        {
+            <p>找不到此商品資料</p>
+            <div class="action-bar">
+                <a href="/?empNo=@Model.CurrentUser" class="btn btn-secondary">返回列表</a>
+            </div>
+        }
+    </div>
+</body>
+</html>
+
+@functions {
+    public class DetailModel : Microsoft.AspNetCore.Mvc.RazorPages.PageModel
+    {
+        public string CurrentUser { get; set; } = "";
+        public ProductDetail? Product { get; set; }
+
+        public void OnGet()
+        {
+            // 取得登入者資訊
+            CurrentUser = AuthHelper.GetEmpNo(Request.Query);
+            
+            // 取得商品 ID
+            string? productId = Request.Query["id"];
+            
+            if (!string.IsNullOrEmpty(productId))
+            {
+                // 載入商品資料（示範用假資料）
+                LoadProduct(productId);
+            }
+        }
+
+        private void LoadProduct(string productId)
+        {
+            // 示範用假資料
+            var products = new Dictionary<string, ProductDetail>
+            {
+                { "P001", new ProductDetail 
+                    { 
+                        Id = "P001", 
+                        Name = "綠鬣蜥", 
+                        Category = "爬蟲類", 
+                        Price = 3500, 
+                        Stock = 5,
+                        Description = "溫馴的綠鬣蜥，適合新手飼養",
+                        CreateDate = DateTime.Now.AddMonths(-2),
+                        Creator = "ADMIN"
+                    }
+                },
+                { "P002", new ProductDetail 
+                    { 
+                        Id = "P002", 
+                        Name = "豹紋守宮", 
+                        Category = "爬蟲類", 
+                        Price = 2800, 
+                        Stock = 8,
+                        Description = "受歡迎的守宮品種，好照顧",
+                        CreateDate = DateTime.Now.AddMonths(-1),
+                        Creator = "ADMIN"
+                    }
+                },
+                { "P003", new ProductDetail 
+                    { 
+                        Id = "P003", 
+                        Name = "爬蟲專用飼料", 
+                        Category = "飼料", 
+                        Price = 450, 
+                        Stock = 50,
+                        Description = "營養均衡的爬蟲類專用飼料",
+                        CreateDate = DateTime.Now.AddDays(-15),
+                        Creator = "USER001"
+                    }
+                },
+                { "P004", new ProductDetail 
+                    { 
+                        Id = "P004", 
+                        Name = "紫外線燈具", 
+                        Category = "設備", 
+                        Price = 1200, 
+                        Stock = 15,
+                        Description = "提供必要的UVB光源",
+                        CreateDate = DateTime.Now.AddDays(-10),
+                        Creator = "USER001"
+                    }
+                },
+                { "P005", new ProductDetail 
+                    { 
+                        Id = "P005", 
+                        Name = "玉米蛇", 
+                        Category = "爬蟲類", 
+                        Price = 4200, 
+                        Stock = 3,
+                        Description = "顏色多樣的玉米蛇，個性溫和",
+                        CreateDate = DateTime.Now.AddDays(-5),
+                        Creator = "ADMIN"
+                    }
+                }
+            };
+
+            if (products.ContainsKey(productId))
+            {
+                Product = products[productId];
+            }
+        }
+    }
+
+    public class ProductDetail
+    {
+        public string Id { get; set; } = "";
+        public string Name { get; set; } = "";
+        public string Category { get; set; } = "";
+        public decimal Price { get; set; }
+        public int Stock { get; set; }
+        public string Description { get; set; } = "";
+        public DateTime CreateDate { get; set; }
+        public string Creator { get; set; } = "";
+    }
+}

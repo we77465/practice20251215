@@ -1,0 +1,21 @@
+@page
+@model CreateModel
+
+@functions {
+    public class CreateModel : Microsoft.AspNetCore.Mvc.RazorPages.PageModel
+    {
+        public Microsoft.AspNetCore.Mvc.IActionResult OnGet()
+        {
+            // 保留 empNo 參數並導向到 Edit 頁面
+            string? empNo = Request.Query["empNo"];
+            if (!string.IsNullOrEmpty(empNo))
+            {
+                return RedirectToPage("/Edit", new { empNo });
+            }
+            else
+            {
+                return RedirectToPage("/Edit");
+            }
+        }
+    }
+}
