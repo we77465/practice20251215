@@ -4,17 +4,17 @@
 @functions {
     public class CreateModel : Microsoft.AspNetCore.Mvc.RazorPages.PageModel
     {
-        public void OnGet()
+        public Microsoft.AspNetCore.Mvc.IActionResult OnGet()
         {
             // 保留 empNo 參數並導向到 Edit 頁面
-            string empNo = Request.Query["empNo"];
+            string? empNo = Request.Query["empNo"];
             if (!string.IsNullOrEmpty(empNo))
             {
-                Response.Redirect($"/Edit?empNo={empNo}");
+                return RedirectToPage("/Edit", new { empNo });
             }
             else
             {
-                Response.Redirect("/Edit");
+                return RedirectToPage("/Edit");
             }
         }
     }
