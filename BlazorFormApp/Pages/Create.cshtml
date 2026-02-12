@@ -1,0 +1,16 @@
+@page
+@model CreateModel
+@{
+    // 導向到 Edit 頁面（新增模式）
+    Response.Redirect("/Edit");
+}
+
+@functions {
+    public class CreateModel : Microsoft.AspNetCore.Mvc.RazorPages.PageModel
+    {
+        public void OnGet()
+        {
+            Response.Redirect("/Edit");
+        }
+    }
+}
